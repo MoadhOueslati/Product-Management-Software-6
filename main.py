@@ -600,6 +600,7 @@ class FreeOver(QDialog, Ui_Dialog):
         
 
 if __name__ == "__main__":
+    print("here i come from mac os lol")
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
