@@ -14,6 +14,8 @@ from PyQt5.uic import loadUi
 from main_style import Ui_MainWindow
 from freemium_over import Ui_Dialog
 
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):   
     def __init__(self):
         super().__init__()
