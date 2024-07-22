@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>pictures/minus-sign.png</file>
+    <file>pictures/minus.png</file>
+    <file>pictures/back.png</file>
+    <file>pictures/cancel.png</file>
+    <file>pictures/delete.png</file>
+    <file>pictures/editing.png</file>
+    <file>pictures/next.png</file>
+    <file>pictures/plus.png</file>
+    <file>pictures/diskette.png</file>
+    <file>pictures/325197ae-001e-4342-b9da-db0b95946c69 (1).jpg</file>
+    <file>pictures/image.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,8 @@
+
+###### BUGS ########
+
+1- disable the up/down keys when selecting an item in QTableWidget
+
+2- suivant/ precedent buttons fucked up and clicking as well
+
+
