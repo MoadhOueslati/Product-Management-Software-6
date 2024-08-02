@@ -16,11 +16,11 @@ from freemium_over import Ui_Dialog
 
 
 
-class MainWindow(QMainWindow, Ui_MainWindow):   
+class MainWindow(QMainWindow):  # Ui_MainWindow
     def __init__(self):
         super().__init__()
         loadUi("styles/main.ui", self)
-        self.setupUi(self)
+        # self.setupUi(self)
         self.sqlite = Sqlite()
         self.sqlite_table_name = "Products"
                   
@@ -58,6 +58,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.itemSelectionChanged.connect(self.selection_changed)
 
         self.rechercherCategorieComboBox.currentTextChanged.connect(self.sort_categorie)
+
+        self.tableWidgetsNames = {
+            "products_table_widget": self.tableWidget,
+            "purchases_table_widget": self.achatTableWidget,
+            "sales_table_widget": self.venteTableWidget
+        }
 
         # Fills category combo boxes
         self.update_category_combos()
@@ -386,7 +392,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.selection_enabled:
             self.fill_product_details(self.current_row_count)
 
-    def delete(self):
+    def delete(self, table_widget_name, deletion_message, ):
         if self.selection_enabled == True:
             try:
                 product_name = self.tableWidget.item(self.current_row_count, 0).text()
