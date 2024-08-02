@@ -1190,11 +1190,6 @@ background-color: rgb(190, 190, 190)
           <attribute name="verticalHeaderStretchLastSection">
            <bool>false</bool>
           </attribute>
-          <row>
-           <property name="text">
-            <string>1</string>
-           </property>
-          </row>
           <column>
            <property name="text">
             <string>Nom du Produit</string>
@@ -1230,11 +1225,6 @@ background-color: rgb(190, 190, 190)
             <string>Notes</string>
            </property>
           </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string>honey</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>
