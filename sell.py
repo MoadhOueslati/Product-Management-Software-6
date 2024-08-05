@@ -15,6 +15,7 @@ class SellWindow(QDialog, Ui_Dialog):
         self.categorieLabel.setText(self.category)
         self.sqlite_table_name = "Sales"
         self.sqlite_database_columns = [
+            "record_id",
             "nom_du_produit",
             "quantite_vendue",
             "prix_vente",
@@ -34,6 +35,7 @@ class SellWindow(QDialog, Ui_Dialog):
         self.close()
 
     def save_changes(self):
+        self.mw.ventes_tab.rows_count += 1
         # Insert data to sqlite
         product_data = self.retrieve_purchase_details()
 
@@ -100,7 +102,12 @@ class SellWindow(QDialog, Ui_Dialog):
         entry_date = self.dateEntreeLineEdit.text()
         notes = self.plainTextEdit.toPlainText()
 
+        record_id = self.mw.ventes_tab.rows_count 
+
+        print(f"product sold new id : {record_id}")
+
         product_data = {
+            'record_id' : record_id,
             "product_name": product_name,
             "quantity_sold" : quantity_sold,
             "sale_price" : sale_price,

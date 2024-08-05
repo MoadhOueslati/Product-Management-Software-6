@@ -7,6 +7,8 @@ from PyQt5.QtCore import QTimer
 from database import Sqlite
 from buy import BuyWindow
 from sell import SellWindow
+from achats_tab import AchatsTab
+from ventes_tab import VentesTab
 from category_settings import CategorieSettings
 import interface_images
 from datetime import date, datetime
@@ -20,6 +22,10 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
     def __init__(self):
         super().__init__()
         loadUi("styles/main.ui", self)
+
+        self.achatModifierButton.setVisible(False)
+        self.venteModifierButton.setVisible(False)
+
         # self.setupUi(self)
         self.sqlite = Sqlite()
         self.sqlite_table_name = "Products"
@@ -51,35 +57,24 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
         self.buy_window = BuyWindow(self.sqlite, self)
         self.sell_window = SellWindow(self.sqlite, self)
 
+        self.update_achat_table()
 
         self.tableWidget.itemClicked.connect(self.on_table_item_clicked)
         self.tabWidget.currentChanged.connect(self.on_tab_changed)
 
         self.tableWidget.itemSelectionChanged.connect(self.selection_changed)
 
-        self.rechercherCategorieComboBox.currentTextChanged.connect(self.sort_categorie)
-
-        self.tableWidgetsNames = {
-            "products_table_widget": self.tableWidget,
-            "purchases_table_widget": self.achatTableWidget,
-            "sales_table_widget": self.venteTableWidget
-        }
-
         # Fills category combo boxes
         self.update_category_combos()
 
+        self.rechercherCategorieComboBox.currentTextChanged.connect(self.sort_categorie)
+
+
         self.ajouterCategorieButton.clicked.connect(self.open_categories_window)
         
-        # Bottom Buttons
-        self.nouveauButton.clicked.connect(self.refresh_product_entry)
-        self.enregistrerButton.clicked.connect(self.save)
-        self.precedentButton.clicked.connect(self.previous)
-        self.suivantButton.clicked.connect(self.next)
-        self.modifierButton.clicked.connect(self.modify)
-        self.annulerButton.clicked.connect(self.cancel)
-        self.supprimerButton.clicked.connect(self.delete)
 
         self.selection_enabled = False
+        self.supprimerButton.clicked.connect(lambda: self.delete(self.tableWidget, self.sqlite_table_name, self.selection_enabled)) 
 
         # Purchase and Sell buttons
         self.acheteeButton.clicked.connect(self.open_buy_window)
@@ -92,8 +87,19 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
         self.current_row_count = -1
         self.searched_categorie = "----------TOUT----------"
 
+        self.achats_tab = AchatsTab(self.sqlite, self)
+        self.ventes_tab = VentesTab(self.sqlite, self)
+
         self.fill_product_data_to_table()
         self.tableWidget.resizeColumnsToContents()
+
+        # Bottom Buttons
+        self.nouveauButton.clicked.connect(self.refresh_product_entry)
+        self.enregistrerButton.clicked.connect(self.save)
+        self.precedentButton.clicked.connect(self.previous)
+        self.suivantButton.clicked.connect(self.next)
+        self.modifierButton.clicked.connect(self.modify)
+        self.annulerButton.clicked.connect(self.cancel)
 
 
     def open_buy_window(self):
@@ -136,8 +142,16 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
             pass
         elif tab_text == "Achats":
             self.update_achat_table()
+            # just to appear selected :p
+            try:
+                self.achatTableWidget.selectRow(self.achats_tab.current_row_count)
+            except: pass
         elif tab_text == "Ventes":
             self.update_vente_table()
+            # just to appear selected :p
+            try:
+                self.achatTableWidget.selectRow(self.ventes_tab.current_row_count)
+            except: pass
 
 
     def refresh_product_entry(self):
@@ -205,6 +219,27 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
         }
 
         return product_data
+
+
+    def reassign_row_ids(self, table_widget, sqlite_table_name):  
+        # Fetch existing rowids from the SQLite table
+        fetch_query = f"SELECT rowid FROM {sqlite_table_name}"
+        existing_rowids = self.sqlite.db.fetch_all_data(fetch_query)
+
+        existing_rowids = [row[0] for row in existing_rowids]
+
+        
+        for index, rowid in enumerate(existing_rowids):
+            new_id = index + 1
+            
+            table_widget.setItem(index, 0, QTableWidgetItem(f"{new_id}"))
+            
+            query = f"UPDATE {sqlite_table_name} SET record_id = ? WHERE rowid = ?"
+            self.sqlite.db.cursor.execute(query, (new_id, rowid))
+        
+        self.sqlite.db.connection.commit()
+
+
 
     def update_achat_table(self):
         # clear before inserting 
@@ -350,7 +385,8 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
 
         self.update_profit_colors()
 
-        self.current_row_count = self.tableWidget.rowCount()
+        # self.current_row_count = self.tableWidget.rowCount() jarabet badaltha 
+        self.current_row_count = -1
         self.tableWidget.resizeColumnsToContents()
     
     def update_category_combos(self):
@@ -373,48 +409,85 @@ class MainWindow(QMainWindow):  # Ui_MainWindow
 
 
     def previous(self):
-        if self.current_row_count > 0 :
-            self.current_row_count -= 1
-            self.tableWidget.selectRow(self.current_row_count)
-            self.acheteeButton.setVisible(True) 
-            self.vendueButton.setVisible(True)
-            self.fill_product_details(self.current_row_count)
+        if self.current_row_count <= 0:
+            self.current_row_count = self.tableWidget.rowCount()
+
+        self.current_row_count -= 1
+        self.tableWidget.selectRow(self.current_row_count)
+        self.acheteeButton.setVisible(True) 
+        self.vendueButton.setVisible(True)
+        self.fill_product_details(self.current_row_count)
 
     def next(self):
-        if self.current_row_count < self.tableWidget.rowCount()-1:
-            self.current_row_count += 1
-            self.tableWidget.selectRow(self.current_row_count)
-            self.acheteeButton.setVisible(True) 
-            self.vendueButton.setVisible(True)
-            self.fill_product_details(self.current_row_count)
+        if self.current_row_count >= self.tableWidget.rowCount()-1:
+            self.current_row_count = -1
+        self.current_row_count += 1
+        self.tableWidget.selectRow(self.current_row_count)
+        self.acheteeButton.setVisible(True) 
+        self.vendueButton.setVisible(True)
+        self.fill_product_details(self.current_row_count)
 
     def cancel(self):
         if self.selection_enabled:
             self.fill_product_details(self.current_row_count)
 
-    def delete(self, table_widget_name, deletion_message, ):
-        if self.selection_enabled == True:
-            try:
-                product_name = self.tableWidget.item(self.current_row_count, 0).text()
-                category = self.tableWidget.item(self.current_row_count, 7).text()
-                # Confirm deletion
-                reply = QMessageBox.question(self, 'Confirmer la Suppression.', 
-                                                f"Êtes-vous sûr de vouloir supprimer le produit '{product_name}' de la catégorie '{category}' ?",
-                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    def delete(self, table_widget, sqlite_table_name, selection_enabled, product_name_coloumn_number=0, category_coloumn_number=7):
+            # By default 0 & 7 for the product table widget
+            if selection_enabled == True:
+                try:
+                    if table_widget == self.tableWidget:
+                        product_name = table_widget.item(self.current_row_count, product_name_coloumn_number).text()
+                        category = table_widget.item(self.current_row_count, category_coloumn_number).text()
+                        # Confirm deletion
+                        reply = QMessageBox.question(self, 'Confirmer la Suppression.', 
+                                                        f"Êtes-vous sûr de vouloir supprimer le produit '{product_name}' de la catégorie '{category}' ?",
+                                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
-                if reply == QMessageBox.Yes:
-                    deleting_query = f"DELETE FROM {self.sqlite_table_name} WHERE nom_du_produit = ? AND categorie = ?"
-                    self.sqlite.db.delete_data(deleting_query, (product_name, category))
-                    self.tableWidget.removeRow(self.current_row_count)
-                    self.tableWidget.clearSelection()
-                    self.refresh_product_entry()
-                else:
+                        if reply == QMessageBox.Yes:
+                            deleting_query = f"DELETE FROM {sqlite_table_name} WHERE nom_du_produit = ? AND categorie = ?"
+                            self.sqlite.db.delete_data(deleting_query, (product_name, category))
+                            table_widget.removeRow(self.current_row_count)
+                            table_widget.clearSelection()
+                        
+                        self.refresh_product_entry()
+
+                    elif table_widget == self.achatTableWidget:   
+                        record_id = table_widget.item(self.achats_tab.current_row_count, 0).text()
+                        # Confirm deletion
+                        reply = QMessageBox.question(self, 'Confirmer la Suppression.', 
+                                                        f"Are sure you want to delete the purchase record where id = {record_id} ? ",
+                                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+                        if reply == QMessageBox.Yes:
+                            deleting_query = f"DELETE FROM {sqlite_table_name} WHERE record_id = ?"
+                            self.sqlite.db.delete_data(deleting_query, (record_id,))
+                            table_widget.removeRow(self.achats_tab.current_row_count)
+                            table_widget.clearSelection()
+                            self.achats_tab.rows_count -= 1
+                            self.reassign_row_ids(self.achatTableWidget, self.achats_tab.sqlite_table_name)
+                            
+                    elif table_widget == self.venteTableWidget:   
+                        record_id = table_widget.item(self.ventes_tab.current_row_count, 0).text()
+                        # Confirm deletion
+                        reply = QMessageBox.question(self, 'Confirmer la Suppression.', 
+                                                        f"Are sure you want to delete the sale record where id = {record_id} ? ",
+                                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+                        if reply == QMessageBox.Yes:
+                            deleting_query = f"DELETE FROM {sqlite_table_name} WHERE record_id = ?"
+                            self.sqlite.db.delete_data(deleting_query, (record_id,))
+                            table_widget.removeRow(self.ventes_tab.current_row_count)
+                            table_widget.clearSelection()
+                            self.ventes_tab.rows_count -= 1
+                            self.reassign_row_ids(self.venteTableWidget, self.ventes_tab.sqlite_table_name)
+
+                except: 
                     pass
-            except: 
-                pass
-        else:
-            select_to_delete_message = "Veuillez sélectionner le produit que vous souhaitez supprimer."
-            self._handle_user_error(select_to_delete_message)
+            else:
+                select_to_delete_message = "Veuillez sélectionner le produit que vous souhaitez supprimer."
+                self._handle_user_error(select_to_delete_message)
+
+        
 
     def delete_by_category(self, category):
         deleting_query = f"DELETE FROM {self.sqlite_table_name} WHERE categorie = ?"

@@ -95,13 +95,6 @@ background-color: rgb(190, 190, 190)
 background-color: rgb(227, 227, 227)
 }
 
-QTableWidget QHeaderView::section:selected {
-background-color: #4CAF50;  /* Selected header background color */
-color: red;  /* Selected header text color */
-font-weight: normal;  /* Prevent bold font on selected state */
-}
-
-
 /* Bottom Containers (Buttons) */
 #produitBottomContainer QPushButton,
 #achatBottomContainer QPushButton,
@@ -129,7 +122,7 @@ background-color: rgb(227, 227, 227)
 
 /* Third Tab */
 #tab_3{
- background-color:   rgb(29, 35, 50);
+ background-color: rgb(29, 35, 50);
 }
 #venteSearchingWidget{
 background-color: rgb(227, 227, 227)
@@ -142,20 +135,11 @@ background-color: rgb(227, 227, 227)
 </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>7</number>
-    </property>
     <property name="leftMargin">
      <number>11</number>
     </property>
     <property name="topMargin">
-     <number>20</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
+     <number>11</number>
     </property>
     <item>
      <widget class="QTabWidget" name="tabWidget">
@@ -1226,6 +1210,11 @@ color: white;
                  <string notr="true">background-color: lightgray;
 </string>
                 </property>
+                <item>
+                 <property name="text">
+                  <string>cheese motherfucker</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item>
@@ -1265,7 +1254,11 @@ color: white;
               <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">QHeaderView::section {
+              <string notr="true">QTableWidget::item{
+background-color: rgb(190, 190, 190)
+}
+
+QHeaderView::section {
 background-color :  rgb(29, 35, 50) ;
 border:1px solid white;
 font-size: 18px;
@@ -1273,25 +1266,25 @@ color:white;
 padding: 2px
 }
 QTableWidget::item:selected {
-background-color: rgb(98, 210, 243);
-color: black;
+background-color: rgb(29, 35, 50) ;
+color: white;
 }
-
-QTableWidget::item{
-background-color: rgb(190, 190, 190)
-}</string>
+</string>
              </property>
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
              </property>
+             <property name="tabKeyNavigation">
+              <bool>false</bool>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>false</bool>
+             </property>
              <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
+              <enum>QAbstractItemView::SingleSelection</enum>
              </property>
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
-             </property>
-             <property name="textElideMode">
-              <enum>Qt::ElideNone</enum>
              </property>
              <property name="verticalScrollMode">
               <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -1301,9 +1294,6 @@ background-color: rgb(190, 190, 190)
              </property>
              <property name="showGrid">
               <bool>true</bool>
-             </property>
-             <property name="gridStyle">
-              <enum>Qt::SolidLine</enum>
              </property>
              <property name="sortingEnabled">
               <bool>false</bool>
@@ -1338,6 +1328,11 @@ background-color: rgb(190, 190, 190)
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
              </attribute>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
              <column>
               <property name="text">
                <string>Nom du Produit</string>
@@ -1661,7 +1656,11 @@ background-color: rgb(190, 190, 190)
               <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">QHeaderView::section {
+              <string notr="true">QTableWidget::item{
+background-color: rgb(190, 190, 190)
+}
+
+QHeaderView::section {
 background-color :  rgb(29, 35, 50) ;
 border:1px solid white;
 font-size: 18px;
@@ -1669,20 +1668,19 @@ color:white;
 padding: 2px
 }
 QTableWidget::item:selected {
-background-color: rgb(98, 210, 243);
-color: black;
-}
-
-QTableWidget::item{
-background-color: rgb(190, 190, 190)
+background-color: rgb(29, 35, 50) ;
+color: white;
 }
 </string>
              </property>
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
              </property>
+             <property name="tabKeyNavigation">
+              <bool>false</bool>
+             </property>
              <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
+              <enum>QAbstractItemView::SingleSelection</enum>
              </property>
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
@@ -1729,6 +1727,16 @@ background-color: rgb(190, 190, 190)
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
              </attribute>
+             <row>
+              <property name="text">
+               <string>1</string>
+              </property>
+             </row>
+             <column>
+              <property name="text">
+               <string/>
+              </property>
+             </column>
              <column>
               <property name="text">
                <string>Nom du Produit</string>
@@ -1764,6 +1772,11 @@ background-color: rgb(190, 190, 190)
                <string>Notes</string>
               </property>
              </column>
+             <item row="0" column="1">
+              <property name="text">
+               <string>awdawd</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

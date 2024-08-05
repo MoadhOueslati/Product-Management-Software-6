@@ -15,6 +15,7 @@ class BuyWindow(QDialog, Ui_Dialog):
         self.categorieLabel.setText(self.category)
         self.sqlite_table_name = "Purchases"
         self.sqlite_database_columns = [
+            "record_id",
             "nom_du_produit",
             "quantite_achetee",
             "prix_achat",
@@ -36,9 +37,10 @@ class BuyWindow(QDialog, Ui_Dialog):
 
     def save_changes(self):
         # Insert data to sqlite
+        self.mw.achats_tab.rows_count += 1
         product_data = self.retrieve_purchase_details()
 
-            # Force required buying informations on user
+        # Force required buying informations on user
         if int(product_data["quantity_purchased"]) == 0 or float(product_data["purchase_price"]) == 0.0:
             empty_data_error_msg = f"Veuillez remplir toutes les informations requises."
             self.mw._handle_user_error(empty_data_error_msg)
@@ -96,7 +98,12 @@ class BuyWindow(QDialog, Ui_Dialog):
         entry_date = self.dateEntreeLineEdit.text()
         notes = self.plainTextEdit.toPlainText()
 
+        record_id = self.mw.achats_tab.rows_count 
+
+        print(f"product bought new id : {record_id}")
+
         product_data = {
+            'record_id' : record_id,
             "product_name": product_name,
             "quantity_purchased" : quantity_purchased,
             "purchase_price" : purchase_price,
